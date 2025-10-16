@@ -2,85 +2,86 @@ import { Request, Response } from 'express';
 import { collections } from '../database';
 import { Recipe } from '../models/users';
 import { ObjectId } from 'mongodb';
-//import { createrecipeSchema } from '../models/recipes';
 
-export const getRecipes = async (req: Request, res: Response) => {
+// GET recipe by ID
+export const getRecipeById = async (req: Request, res: Response): Promise<void> => {
+  const id = req.params.id;
 
-  try {
-    const recipe = (await collections.Recipe?.find({}).toArray()) as unknown as Recipe[];
-
-  } catch (error ) {
-    res.status(500).send("oops");
+  if (!ObjectId.isValid(id)) {
+    res.status(400).json({ message: "Invalid recipe ID format." });
+    return;
   }
-};
 
-export const getRecipesById = async (req: Request, res: Response) => {
-  //get a single recipe by ID from the database
-
-  let id: string = req.params.id;
   try {
-    const query = { _id: new ObjectId(id) };
-    const recipe = (await collections.Recipe?.findOne(query)) as unknown as Recipe;
+    const recipe = await collections.book?.findOne({ _id: new ObjectId(id) });
 
-    if (recipe) {
-      res.status(200).send(recipe);
+    if (!recipe) {
+      res.status(404).json({ message: `No recipe found with ID: ${id}` });
+      return;
     }
+
+    res.status(200).json(recipe);
   } catch (error) {
-    res.status(404).send(`Unable to find matching document with id: ${req.params.id}`);
+    console.error("Error fetching recipe by ID:", error);
+    res.status(500).json({ message: "Failed to fetch recipe." });
   }
 };
 
-
-export const createRecipe = async (req: Request, res: Response) => {
-  // create a new recipe in the database
-
-  console.log(req.body); //for now still log the data
-
-
-  //new safeparse area
-    // const validation = createrecipeSchema.safeParse(req.body);
-
-    // if (!validation.success) {
-    //   return res.status(400).json({
-    //     message: 'Validation failed',
-    //     errors: validation.error.issues
-    //   });
-    // }
-
-    const { name,ingredients,origin , difficulty, recipe, imageUrl , cookingDuration} = req.body;
-    const newRecipe : Recipe = {name : name, ingredients: ingredients, origin: origin, difficulty: difficulty, recipe:recipe , cookingDuration:cookingDuration, imageUrl:imageUrl};
+// GET all recipes
+export const getAllRecipes = async (_req: Request, res: Response): Promise<void> => {
   try {
-    const result = await collections.Recipe?.insertOne(newRecipe)
+    const recipes = await collections.book?.find({}).toArray();
+
+    if (!recipes || recipes.length === 0) {
+      res.status(404).json({ message: "No recipes found." });
+      return;
+    }
+
+    res.status(200).json(recipes);
+  } catch (error) {
+    console.error("Error fetching all recipes:", error);
+    res.status(500).json({ message: "Failed to retrieve recipes." });
+  }
+};
+
+// CREATE new recipe
+export const createRecipe = async (req: Request, res: Response): Promise<void> => {
+  console.log(req.body); // log incoming data
+
+  const { name, ingredients, origin, difficulty, recipe, imageUrl, cookingDuration } = req.body;
+
+  if (!name || !ingredients || !difficulty || !recipe) {
+    res.status(400).json({ message: "Missing required fields." });
+    return;
+  }
+
+  const newRecipe: Recipe = { name, ingredients, origin, difficulty, recipe, imageUrl, cookingDuration };
+
+  try {
+    const result = await collections.book?.insertOne(newRecipe);
 
     if (result) {
-      res.status(201).location(`${result.insertedId}`).json({ message: `Created a new recipe with id ${result.insertedId}` })
+      res.status(201).location(`${result.insertedId}`).json({ message: `Created a new recipe with id ${result.insertedId}` });
+    } else {
+      res.status(500).json({ message: "Failed to create a new recipe." });
     }
-    else {
-      res.status(500).send("Failed to create a new recipe.");
-    }
+  } catch (error) {
+    console.error("Error inserting recipe:", error);
+    res.status(500).json({ message: "Unable to create new recipe." });
   }
-  catch (error) {
-    if (error instanceof Error)
-    {
-     console.log(`issue with inserting ${error.message}`);
-    }
-    else{
-      console.log(`error with ${error}`)
-    }
-    res.status(400).send(`Unable to create new recipe`);
-  }
-}
+};
 
-
-// issues with updating the recipe details -- ask again in class 
+// UPDATE recipe by ID
 export const updateRecipe = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
 
-  try {
-    const query = { _id: new ObjectId(id) };
-    const update = { $set: req.body };
+  if (!ObjectId.isValid(id)) {
+    res.status(400).json({ message: "Invalid recipe ID." });
+    return;
+  }
 
-    const result = await collections.Recipe?.updateOne(query, update);
+  try {
+    const result = await collections.book?.updateOne({ _id: new ObjectId(id) }, { $set: req.body });
 
     if (!result || result.matchedCount === 0) {
       res.status(404).json({ message: `No recipe found with id ${id}` });
@@ -90,19 +91,21 @@ export const updateRecipe = async (req: Request, res: Response): Promise<void> =
     res.status(200).json({ message: `Successfully updated recipe ${id}` });
   } catch (error) {
     console.error("Error updating recipe:", error);
-    res.status(400).json({ message: "Invalid ID or update failed." });
+    res.status(500).json({ message: "Failed to update recipe." });
   }
 };
 
+// DELETE recipe by ID
+export const deleteRecipe = async (req: Request, res: Response): Promise<void> => {
+  const id = req.params.id;
 
-
-export const deleteRecipe = async (req: Request, res: Response) => {
-  // logic to delete recipe by ID from the database
-const id = req.params.id;
+  if (!ObjectId.isValid(id)) {
+    res.status(400).json({ message: "Invalid recipe ID." });
+    return;
+  }
 
   try {
-    const query = { _id: new ObjectId(id) };
-    const result = await collections.Recipe?.deleteOne(query);
+    const result = await collections.book?.deleteOne({ _id: new ObjectId(id) });
 
     if (!result || result.deletedCount === 0) {
       res.status(404).json({ message: `No recipe found with id ${id}` });
@@ -112,6 +115,6 @@ const id = req.params.id;
     res.status(200).json({ message: `Deleted recipe ${id} successfully.` });
   } catch (error) {
     console.error("Error deleting recipe:", error);
-    res.status(400).json({ message: "Invalid ID or delete failed." });
+    res.status(500).json({ message: "Failed to delete recipe." });
   }
 };

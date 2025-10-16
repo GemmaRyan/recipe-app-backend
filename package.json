@@ -8,24 +8,26 @@
     "start": "node build/index.js",
     "dev": "nodemon"
   },
-    "nodemonConfig": {
+  "nodemonConfig": {
     "watch": [
-    "src"
+      "src"
     ],
     "ext": "ts",
     "exec": "ts-node src/index.ts"
-    },
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "mongodb": "^6.20.0",
     "morgan": "^1.10.1"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.7.2",

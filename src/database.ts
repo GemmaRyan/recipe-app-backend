@@ -1,40 +1,29 @@
 import { MongoClient, Db, Collection } from "mongodb";
 import dotenv from "dotenv";
+import { Recipe } from "./models/users";
 
 dotenv.config();
 
 const connectionString: string = process.env.DB_CONN_STRING || "";
-const dbName: string = process.env.DB_NAME || "Web2Project";
+const dbName: string = process.env.DB_NAME || "PersonalRecipeBook";
+
+if (!connectionString) throw new Error("No connection string in .env");
+
 const client = new MongoClient(connectionString);
 
-export const collections: { Recipe?: Collection } = {}
-
-if (connectionString == "") {
-    throw new Error("No connection string  in .env");
-}
-
+export const collections: { book?: Collection<Recipe> } = {};
 
 let db: Db;
 
 export async function initDb(): Promise<void> {
+  try {
+    await client.connect();
+    db = client.db(dbName);
+    collections.book = db.collection<Recipe>("book");
 
-    try {
-        await client.connect();
-        db = client.db(dbName);
-        const recipeCollection: Collection = db.collection('Recipe')
-        collections.Recipe = recipeCollection;
-
-        console.log('connected to database')
-
-    }
-
-    catch (error) {
-        if (error instanceof Error) {
-            console.log(`issue with db connection ${error.message}`);
-        } else {
-            console.log(`error with ${error}`);
-        }
-
-    }
-
+    console.log("✅ Connected to database");
+  } catch (error) {
+    console.error("❌ Failed to connect to database:", error);
+    throw error; // Prevent server from starting if DB fails
+  }
 }

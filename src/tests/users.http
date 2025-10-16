@@ -1,4 +1,4 @@
-@endpoint = http://localhost:4000/api/v1/users
+@endpoint = http://localhost:3001/api/v1/users
 
 POST {{endpoint}} HTTP/3.0
 content-type: application/json
@@ -27,13 +27,13 @@ x-api-key: blahblah
 
 ###
 
-@UserID = 68f0d5c571812f7147c3290d
+@UserID = 68f0e4437bb4cc1a3426d713
 GET {{endpoint}}/{{UserID}} HTTP/3.0
+content-type: application/json
 x-api-key: blahblah
 
 
 ###
-@UserID = 68f0d5c571812f7147c3290d
 PUT {{endpoint}}/{{UserID}} HTTP/3.0
 content-type: application/json
 x-api-key: blahblah
