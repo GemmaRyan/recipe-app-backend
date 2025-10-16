@@ -21,9 +21,9 @@ export async function initDb(): Promise<void> {
     db = client.db(dbName);
     collections.book = db.collection<Recipe>("book");
 
-    console.log("✅ Connected to database");
+    console.log("Connected to database");
   } catch (error) {
-    console.error("❌ Failed to connect to database:", error);
-    throw error; // Prevent server from starting if DB fails
+    console.error("Failed to connect to database:", error);
+    throw error; 
   }
 }

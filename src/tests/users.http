@@ -26,12 +26,52 @@ x-api-key: blahblah
 }
 
 ###
+POST {{endpoint}} HTTP/3.0
+content-type: application/json
+x-api-key: blahblah
 
+{
+   "name": "AppleTart",
+   "ingredients": [
+       "1 sheet puff pastry",
+       "3 apples, peeled, cored and sliced",
+       "50g sugar",
+       "1 tsp cinnamon",
+       "1 tbsp butter, melted"
+   ],
+   "recipe": [
+       "1. Preheat the oven to 200C/180C fan/gas 6.",
+       "2. Roll out the puff pastry on a floured surface and place it in a tart tin.",
+       "3. Arrange the apple slices on top of the pastry.",
+       "4. Mix the sugar and cinnamon together, then sprinkle over the apples.",
+       "5. Drizzle the melted butter over the top.",
+       "6. Bake for 25-30 minutes until the pastry is golden and the apples are tender."
+   ],
+   "cookingDuration": "25-30 mins",
+   "difficulty": 2,
+   "origin": "https://www.bbcgoodfood.com/recipes/apple-tart",
+   "imageUrl": "https://www.apple-pinklady.com/app/uploads/2025/02/PL-Recette-600x1065-Tarte-pomme-irlandaise.jpg"
+
+}
+
+
+###
 @UserID = 68f0fc2768aa3f9b01841231
 GET {{endpoint}}/{{UserID}} HTTP/3.0
 content-type: application/json
 x-api-key: blahblah
 
+
+###
+GET {{endpoint}} HTTP/3.0
+content-type: application/json
+x-api-key: blahblah
+
+###
+@Name = AppleTart
+GET {{endpoint}}/name/{{Name}} HTTP/3.0
+content-type: application/json
+x-api-key: blahblah
 
 ###
 PUT {{endpoint}}/{{UserID}} HTTP/3.0

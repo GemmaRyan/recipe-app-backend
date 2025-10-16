@@ -19,10 +19,9 @@ export const getRecipeById = async (req: Request, res: Response) => {
 };
 
 
-// GET all recipes
-export const getAllRecipes = async (_req: Request, res: Response): Promise<void> => {
+export const getAllRecipes = async (_req: Request, res: Response) => {
   try {
-    const recipes = await collections.book?.find({}).toArray();
+    const recipes = await collections.book?.find({}).toArray() as Recipe[] | undefined;
 
     if (!recipes || recipes.length === 0) {
       res.status(404).json({ message: "No recipes found." });
@@ -33,6 +32,30 @@ export const getAllRecipes = async (_req: Request, res: Response): Promise<void>
   } catch (error) {
     console.error("Error fetching all recipes:", error);
     res.status(500).json({ message: "Failed to retrieve recipes." });
+  }
+};
+
+export const getRecipeByName = async (req: Request, res: Response) => {
+  const name = req.params.name;
+
+  if (!name || name.trim() === "") {
+    res.status(400).json({ message: "Recipe name is required." });
+    return;
+  }
+
+  try {
+    // Exact match query
+    const recipes = await collections.book?.find({ name: name }).toArray() as Recipe[] | undefined;
+
+    if (!recipes || recipes.length === 0) {
+      res.status(404).json({ message: `No recipe found with name: ${name}` });
+      return;
+    }
+
+    res.status(200).json(recipes);
+  } catch (error) {
+    console.error("Error fetching recipe by name:", error);
+    res.status(500).json({ message: "Failed to retrieve recipe." });
   }
 };
 
