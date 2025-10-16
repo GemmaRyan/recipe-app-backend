@@ -7,7 +7,7 @@ import { ObjectId } from 'mongodb';
 export const getRecipes = async (req: Request, res: Response) => {
 
   try {
-    const recipe = (await collections.recipes?.find({}).toArray()) as unknown as Recipe[];
+    const recipe = (await collections.Recipe?.find({}).toArray()) as unknown as Recipe[];
 
   } catch (error ) {
     res.status(500).send("oops");
@@ -20,7 +20,7 @@ export const getRecipesById = async (req: Request, res: Response) => {
   let id: string = req.params.id;
   try {
     const query = { _id: new ObjectId(id) };
-    const recipe = (await collections.recipes?.findOne(query)) as unknown as Recipe;
+    const recipe = (await collections.Recipe?.findOne(query)) as unknown as Recipe;
 
     if (recipe) {
       res.status(200).send(recipe);
@@ -50,7 +50,7 @@ export const createRecipe = async (req: Request, res: Response) => {
     const { name,ingredients,origin , difficulty, recipe, imageUrl , cookingDuration} = req.body;
     const newRecipe : Recipe = {name : name, ingredients: ingredients, origin: origin, difficulty: difficulty, recipe:recipe , cookingDuration:cookingDuration, imageUrl:imageUrl};
   try {
-    const result = await collections.recipes?.insertOne(newRecipe)
+    const result = await collections.Recipe?.insertOne(newRecipe)
 
     if (result) {
       res.status(201).location(`${result.insertedId}`).json({ message: `Created a new recipe with id ${result.insertedId}` })
@@ -80,7 +80,7 @@ export const updateRecipe = async (req: Request, res: Response): Promise<void> =
     const query = { _id: new ObjectId(id) };
     const update = { $set: req.body };
 
-    const result = await collections.recipes?.updateOne(query, update);
+    const result = await collections.Recipe?.updateOne(query, update);
 
     if (!result || result.matchedCount === 0) {
       res.status(404).json({ message: `No recipe found with id ${id}` });
@@ -102,7 +102,7 @@ const id = req.params.id;
 
   try {
     const query = { _id: new ObjectId(id) };
-    const result = await collections.recipes?.deleteOne(query);
+    const result = await collections.Recipe?.deleteOne(query);
 
     if (!result || result.deletedCount === 0) {
       res.status(404).json({ message: `No recipe found with id ${id}` });

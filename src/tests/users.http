@@ -1,4 +1,4 @@
-@endpoint = http://localhost:3000/api/v1/users
+@endpoint = http://localhost:4000/api/v1/users
 
 POST {{endpoint}} HTTP/3.0
 content-type: application/json
@@ -27,6 +27,35 @@ x-api-key: blahblah
 
 ###
 
-@UserID = 68f0131871812f7147c3290c
+@UserID = 68f0d5c571812f7147c3290d
 GET {{endpoint}}/{{UserID}} HTTP/3.0
 x-api-key: blahblah
+
+
+###
+@UserID = 68f0d5c571812f7147c3290d
+PUT {{endpoint}}/{{UserID}} HTTP/3.0
+content-type: application/json
+x-api-key: blahblah
+
+{ "name" : "AppleTart",
+  "ingredients" : [ "225g self-raising flour", 
+                     "55g caster sugar", 
+                     "1 tsp baking powder", 
+                     "½ tsp salt", "55g cold butter, diced", 
+                     "150ml whole milk", 
+                     "75g fresh raspberries", 
+                     "50g white chocolate, chopped" 
+                  ],
+   "origin" : "UK",
+  "recipe" : [ "1. Heat oven to 220C/200C fan/gas 7. Line a baking tray with baking parchment.", 
+               "2. Mix the flour, sugar, baking powder and salt in a large bowl. Add the butter and rub in with your fingertips until the mixture resembles fine breadcrumbs.", 
+               "3. Make a well in the centre and pour in the milk. Mix with a knife until you have a soft dough, then gently fold in the raspberries and white chocolate.", 
+               "4. Turn out onto a lightly floured surface and knead lightly until smooth. Pat into a 20cm round about 2.5cm thick. Cut into 8 wedges and place on the baking tray.", 
+               "5. Brush the tops with a little milk and bake for 12-15 mins until well risen and golden-brown. Cool on a wire rack." 
+               ],
+   "cookingDuration": "25-30 mins",
+   "difficulty": 1,
+   "origin": "https://www.bbcgoodfood.com/recipes/raspberry-white-chocolate-scones",
+   "imageUrl": "https://images.immediate.co.uk/production/volatile/sites/30/2021/05/Raspberry_White-Chocolate-Scones-f6060f2.jpg?quality=90&webp=true&resize=900,817"
+}
