@@ -35,6 +35,8 @@ export const getAllRecipes = async (_req: Request, res: Response) => {
   }
 };
 
+
+//alter this to be able to search not by the exact match -- anything containing the string
 export const getRecipeByName = async (req: Request, res: Response) => {
   const name = req.params.name;
 
@@ -44,7 +46,6 @@ export const getRecipeByName = async (req: Request, res: Response) => {
   }
 
   try {
-    // Exact match query
     const recipes = await collections.book?.find({ name: name }).toArray() as Recipe[] | undefined;
 
     if (!recipes || recipes.length === 0) {
@@ -59,10 +60,9 @@ export const getRecipeByName = async (req: Request, res: Response) => {
   }
 };
 
-// CREATE new recipe
-export const createRecipe = async (req: Request, res: Response): Promise<void> => {
-  console.log(req.body); // log incoming data
 
+export const createRecipe = async (req: Request, res: Response): Promise<void> => {
+  console.log(req.body); 
   const { name, ingredients, origin, difficulty, recipe, imageUrl, cookingDuration } = req.body;
 
   if (!name || !ingredients || !difficulty || !recipe) {
@@ -90,13 +90,23 @@ export const createRecipe = async (req: Request, res: Response): Promise<void> =
 export const updateRecipe = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
 
+  // Validate ID format
   if (!ObjectId.isValid(id)) {
     res.status(400).json({ message: "Invalid recipe ID." });
     return;
   }
 
+  // Ensure there's at least one field to update
+  if (!req.body || Object.keys(req.body).length === 0) {
+    res.status(400).json({ message: "No fields provided for update." });
+    return;
+  }
+
   try {
-    const result = await collections.book?.updateOne({ _id: new ObjectId(id) }, { $set: req.body });
+    const result = await collections.book?.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: req.body }
+    );
 
     if (!result || result.matchedCount === 0) {
       res.status(404).json({ message: `No recipe found with id ${id}` });
