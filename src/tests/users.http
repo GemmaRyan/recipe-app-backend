@@ -27,7 +27,7 @@ x-api-key: blahblah
 
 ###
 
-@UserID = 68f0e4437bb4cc1a3426d713
+@UserID = 68f0fc2768aa3f9b01841231
 GET {{endpoint}}/{{UserID}} HTTP/3.0
 content-type: application/json
 x-api-key: blahblah

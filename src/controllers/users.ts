@@ -4,28 +4,20 @@ import { Recipe } from '../models/users';
 import { ObjectId } from 'mongodb';
 
 // GET recipe by ID
-export const getRecipeById = async (req: Request, res: Response): Promise<void> => {
-  const id = req.params.id;
-
-  if (!ObjectId.isValid(id)) {
-    res.status(400).json({ message: "Invalid recipe ID format." });
-    return;
-  }
-
+export const getRecipeById = async (req: Request, res: Response) => {
+    let id: string = req.params.id;
   try {
-    const recipe = await collections.book?.findOne({ _id: new ObjectId(id) });
+    const query = { _id: new ObjectId(id) };
+    const user = (await collections.book?.findOne(query)) as unknown as Recipe;
 
-    if (!recipe) {
-      res.status(404).json({ message: `No recipe found with ID: ${id}` });
-      return;
+    if (user) {
+      res.status(200).send(user);
     }
-
-    res.status(200).json(recipe);
   } catch (error) {
-    console.error("Error fetching recipe by ID:", error);
-    res.status(500).json({ message: "Failed to fetch recipe." });
+    res.status(404).send(`Unable to find matching document with id: ${req.params.id}`);
   }
 };
+
 
 // GET all recipes
 export const getAllRecipes = async (_req: Request, res: Response): Promise<void> => {
