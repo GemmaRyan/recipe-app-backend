@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { initDb } from "../src/database";
 import userRoutes from "./routes/users";
 import { authenticateKey } from "./middleware/auth.middleware";
+export { app }; // Export app for testing purposes + Added this myself -- check over later
 
 dotenv.config(); 
 
