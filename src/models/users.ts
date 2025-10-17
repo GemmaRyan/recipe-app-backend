@@ -12,15 +12,13 @@ export interface Recipe {
     imageUrl?: string;
 }
 
-//getting the regex patterns in place for validation
-  const ALPHANUM_AND_SPACES = /^[A-Za-z0-9\s]+$/;
 
 
 export const createRecipeSchema = z.object({
   name: z
     .string()
     .min(2, "Name must be at least 2 characters.")
-    .regex(ALPHANUM_AND_SPACES),
+    .regex(/^[A-Za-z0-9\s]+$/, "Name can only contain alphanumeric characters and spaces."),
 
   origin: z
     .string()

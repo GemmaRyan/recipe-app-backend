@@ -27,3 +27,8 @@ export async function initDb(): Promise<void> {
     throw error; 
   }
 }
+
+export async function closeDb(): Promise<void> {
+    await client.close();
+    console.log('Database connection closed');
+}
