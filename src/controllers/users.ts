@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { collections } from '../database';
 import { Recipe } from '../models/users';
 import { ObjectId } from 'mongodb';
+import { createRecipeSchema } from '../models/users';
+
 
 // GET recipe by ID
 export const getRecipeById = async (req: Request, res: Response) => {
@@ -61,8 +63,18 @@ export const getRecipeByName = async (req: Request, res: Response) => {
 };
 
 
-export const createRecipe = async (req: Request, res: Response): Promise<void> => {
+export const createRecipe = async (req: Request, res: Response) => {
   console.log(req.body); 
+
+   const validation = createRecipeSchema.safeParse(req.body); //addde zod validation to the create user
+
+  if (!validation.success) {
+    return res.status(400).json({
+      message: 'Validation failed',
+      errors: validation.error.issues
+    });
+  }
+
   const { name, ingredients, origin, difficulty, recipe, imageUrl, cookingDuration } = req.body;
 
   if (!name || !ingredients || !difficulty || !recipe) {
@@ -74,6 +86,7 @@ export const createRecipe = async (req: Request, res: Response): Promise<void> =
 
   try {
     const result = await collections.book?.insertOne(newRecipe);
+
 
     if (result) {
       res.status(201).location(`${result.insertedId}`).json({ message: `Created a new recipe with id ${result.insertedId}` });

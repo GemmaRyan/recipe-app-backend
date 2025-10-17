@@ -12,14 +12,13 @@ x-api-key: blahblah
                      "150ml whole milk", "75g fresh raspberries", 
                      "50g white chocolate, chopped" 
                   ],
-   "origin" : "UK",
   "recipe" : [ "1. Heat oven to 220C/200C fan/gas 7. Line a baking tray with baking parchment.", 
                "2. Mix the flour, sugar, baking powder and salt in a large bowl. Add the butter and rub in with your fingertips until the mixture resembles fine breadcrumbs.", 
                "3. Make a well in the centre and pour in the milk. Mix with a knife until you have a soft dough, then gently fold in the raspberries and white chocolate.", 
                "4. Turn out onto a lightly floured surface and knead lightly until smooth. Pat into a 20cm round about 2.5cm thick. Cut into 8 wedges and place on the baking tray.", 
                "5. Brush the tops with a little milk and bake for 12-15 mins until well risen and golden-brown. Cool on a wire rack." 
                ],
-   "cookingDuration": "25-30 mins",
+   "cookingDuration": "25-30",
    "difficulty": 1,
    "origin": "https://www.bbcgoodfood.com/recipes/raspberry-white-chocolate-scones",
    "imageUrl": "https://images.immediate.co.uk/production/volatile/sites/30/2021/05/Raspberry_White-Chocolate-Scones-f6060f2.jpg?quality=90&webp=true&resize=900,817"
@@ -47,7 +46,7 @@ x-api-key: blahblah
        "Drizzle the melted butter over the top.",
        "Bake for 25-30 minutes until the pastry is golden and the apples are tender."
    ],
-   "cookingDuration": "25-30 mins",
+   "cookingDuration": "25-30 ",
    "difficulty": 2,
    "origin": "https://www.bbcgoodfood.com/recipes/apple-tart",
    "imageUrl": "https://www.apple-pinklady.com/app/uploads/2025/02/PL-Recette-600x1065-Tarte-pomme-irlandaise.jpg"
@@ -56,7 +55,7 @@ x-api-key: blahblah
 
 
 ###
-@UserID = 68f0f1b4ea1b74e363196727
+@UserID = 68f24951ed8f78d4f918a137
 GET {{endpoint}}/{{UserID}} HTTP/3.0
 content-type: application/json
 x-api-key: blahblah
@@ -88,15 +87,37 @@ x-api-key: blahblah
                      "2 ripe bananas, mashed",
                      "1 tsp vanilla extract"
                   ],
-   "origin" : "South Africa",
   "recipe" : [ "Heat oven to 180C/160C fan/gas 4. Grease and line a 2lb loaf tin with baking parchment.",
                "Add all ingretients but the bananas and vanilla extract together and mix well", 
                "Add the vanilla extract and mashed bananas. Mix well",
                "Pour into a greased loaf tin and bake for 40-50 mins until a skewer inserted into the middle comes out clean",
                "Cool in the tin for 10 mins, then turn out onto a wire rack to cool completely."
                ],
-   "cookingDuration": "70-80 mins",
+   "cookingDuration": "70-80 ",
    "difficulty": 1,
    "origin": "https://www.bbcgoodfood.com/recipes/raspberry-white-chocolate-scones",
    "imageUrl": "https://images.immediate.co.uk/production/volatile/sites/30/2021/05/Raspberry_White-Chocolate-Scones-f6060f2.jpg?quality=90&webp=true&resize=900,817"
+}
+
+
+###
+// adding in incorrect data to test validation
+POST {{endpoint}} HTTP/3.0
+content-type: application/json
+x-api-key: blahblah
+
+{
+   "name": "CarmalSquares 2124324",
+   "ingredients": [],
+   "origin": "1",
+   "recipe": [
+       "Heat oven to 180C/160C fan/gas 4. Line and grease a 20cm square tin with baking parchment.",
+       "Melt the butter, golden syrup and sugar in a large saucepan over a low heat, stirring occasionally until the sugar has dissolved.",
+       "Remove from the heat and stir in the condensed milk and bicarbonate of soda. Pour into the prepared tin and bake for 25-30 mins until golden brown and set.",
+       "Leave to cool in the tin for 10 mins, then transfer to a wire rack to cool completely. Once cool, cut into squares to serve."
+   ],
+   "cookingDuration": "25-30 ",
+   "difficulty": "meow",
+   "imageUrl": ""
+
 }
