@@ -10,4 +10,7 @@ afterAll(async () => {
   console.log = console.log;
 });
 
+
+
+
 closeDb(); // closing the database connection after tests are done
