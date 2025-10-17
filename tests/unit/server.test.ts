@@ -1,6 +1,6 @@
 import request from "supertest";
 
-import { app } from "../../index";
+import { app } from "../../src/index";
 
 describe("Basic server running and answering ping", () => {
   test("Testing the ping", async () => {
