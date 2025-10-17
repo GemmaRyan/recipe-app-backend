@@ -1,7 +1,6 @@
 import express, { Application, Request, Response } from "express";
 import morgan from "morgan";
 import dotenv from "dotenv";
-import { initDb } from "../src/database";
 import userRoutes from "./routes/users";
 import { authenticateKey } from "./middleware/auth.middleware";
 export { app }; // Export app for testing purposes + Added this myself -- check over later
@@ -16,18 +15,18 @@ app.use(morgan("tiny"));
 app.use(express.json());  
 
 app.get("/ping", (_req: Request, res: Response) => {
-  res.json({ message: "Server is running " });
+  res.json({ message: "hello from Gemma" });
 });
 
 
 //change this later if everything else is working 
 app.use("/api/v1/users", authenticateKey, userRoutes);
 
-initDb()
-  .then(() => {
-    app.listen(PORT, () => console.log(` Server running on http://localhost:${PORT}`));
-  })
-  .catch((error) => {
-    console.error("Failed to connect to database:", error);
-    process.exit();
-  });
+// initDb()
+//   .then(() => {
+//     app.listen(PORT, () => console.log(` Server running on http://localhost:${PORT}`));
+//   })
+//   .catch((error) => {
+//     console.error("Failed to connect to database:", error);
+//     process.exit();
+//   });
