@@ -1,4 +1,6 @@
 import express, {Router} from 'express';
+import { validate } from '../middleware/validate.middleware';
+import { createRecipeSchema } from '../models/users'; 
 import {
   getAllRecipes,
   getRecipeById,
@@ -17,5 +19,6 @@ router.get('/name/:name', getRecipeByName);
 router.post('/', authenticateKey, createRecipe);
 router.put('/:id', updateRecipe);
 router.delete('/:id', deleteRecipe);
+router.post('/', validate(createRecipeSchema), createRecipe);
 
 export default router;

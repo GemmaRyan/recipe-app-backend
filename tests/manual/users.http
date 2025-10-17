@@ -55,7 +55,7 @@ x-api-key: blahblah
 
 
 ###
-@UserID = 68f24951ed8f78d4f918a137
+@UserID = 68f24fb3b9febbebafb02583 
 GET {{endpoint}}/{{UserID}} HTTP/3.0
 content-type: application/json
 x-api-key: blahblah
@@ -67,7 +67,7 @@ content-type: application/json
 x-api-key: blahblah
 
 ###
-@Name = AppleTart
+@Name = CarmalSquares 2124324
 GET {{endpoint}}/name/{{Name}} HTTP/3.0
 content-type: application/json
 x-api-key: blahblah
@@ -121,3 +121,8 @@ x-api-key: blahblah
    "imageUrl": ""
 
 }
+###
+@UserdeleteID = 68f245a741ad8ff361cd572c
+DELETE {{endpoint}}/{{UserID}} HTTP/3.0
+content-type: application/json
+x-api-key: blahblah

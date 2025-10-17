@@ -66,15 +66,6 @@ export const getRecipeByName = async (req: Request, res: Response) => {
 export const createRecipe = async (req: Request, res: Response) => {
   console.log(req.body); 
 
-   const validation = createRecipeSchema.safeParse(req.body); //addde zod validation to the create user
-
-  if (!validation.success) {
-    return res.status(400).json({
-      message: 'Validation failed',
-      errors: validation.error.issues
-    });
-  }
-
   const { name, ingredients, origin, difficulty, recipe, imageUrl, cookingDuration } = req.body;
 
   if (!name || !ingredients || !difficulty || !recipe) {
