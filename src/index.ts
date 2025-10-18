@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import userRoutes from "./routes/recipe";
 import { initDb } from "./database";
 import { authenticateKey } from "./middleware/auth.middleware";
-export { app }; // Export app for testing purposes + Added this myself -- check over later
+export { app }; 
 
 dotenv.config(); 
 
@@ -19,8 +19,7 @@ app.get("/ping", (_req: Request, res: Response) => {
   res.json({ message: "hello from Gemma" });
 });
 
-
-//change this later if everything else is working 
+//adding in the authenticate key middleware to protect the routes
 app.use("/api/v1/users", authenticateKey, userRoutes);
 
 initDb()
