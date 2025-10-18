@@ -1,7 +1,7 @@
 import express, { Application, Request, Response } from "express";
 import morgan from "morgan";
 import dotenv from "dotenv";
-import userRoutes from "./routes/users";
+import userRoutes from "./routes/recipe";
 import { initDb } from "./database";
 import { authenticateKey } from "./middleware/auth.middleware";
 export { app }; // Export app for testing purposes + Added this myself -- check over later

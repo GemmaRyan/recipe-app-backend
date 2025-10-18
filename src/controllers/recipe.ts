@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { collections } from '../database';
-import { Recipe } from '../models/users';
+import { Recipe } from '../models/recipe';
 import { ObjectId } from 'mongodb';
-import { createRecipeSchema } from '../models/users';
+import { createRecipeSchema } from '../models/recipe';
 
 
 // GET recipe by ID

@@ -1,6 +1,6 @@
 import express, {Router} from 'express';
 import { validate } from '../middleware/validate.middleware';
-import { createRecipeSchema } from '../models/users'; 
+import { createRecipeSchema } from '../models/recipe'; 
 import {
   getAllRecipes,
   getRecipeById,
@@ -8,7 +8,7 @@ import {
   createRecipe,
   updateRecipe,
   deleteRecipe,
-} from '../controllers/users';
+} from '../controllers/recipe';
 import {authenticateKey} from '../middleware/auth.middleware'
 
 const router: Router = express.Router();

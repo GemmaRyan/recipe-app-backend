@@ -1,6 +1,6 @@
 import { MongoClient, Db, Collection } from "mongodb";
 import dotenv from "dotenv";
-import { Recipe } from "./models/users";
+import { Recipe } from "./models/recipe";
 
 dotenv.config();
 

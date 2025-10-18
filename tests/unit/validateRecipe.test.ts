@@ -1,6 +1,4 @@
-import { validate } from "../../src/middleware/validate.middleware";
-import { createRecipeSchema } from "../../src/models/users";
-
+import { createRecipeSchema } from "../../src/models/recipe";
 
 const validRecipe = {
   name: "Brownies",
