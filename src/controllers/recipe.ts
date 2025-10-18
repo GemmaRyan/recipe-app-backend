@@ -66,7 +66,16 @@ export const getRecipeByName = async (req: Request, res: Response) => {
 export const createRecipe = async (req: Request, res: Response) => {
   console.log(req.body); 
 
-  const { name, ingredients, origin, difficulty, recipe, imageUrl, cookingDuration } = req.body;
+  const validation = createRecipeSchema.safeParse(req.body);
+
+  if (!validation.success) {
+    return res.status(400).json({
+      message: "Validation failed",
+      errors: validation.error.issues,
+    });
+  }
+
+  const { name, ingredients, origin, difficulty, recipe, imageUrl, cookingDuration } = validation.data;
 
   if (!name || !ingredients || !difficulty || !recipe) {
     res.status(400).json({ message: "Missing required fields." });

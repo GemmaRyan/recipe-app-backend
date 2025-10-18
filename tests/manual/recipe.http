@@ -55,7 +55,7 @@ x-api-key: blahblah
 
 
 ###
-@UserID = 68f24fb3b9febbebafb02583 
+@UserID = 68f406f5cec110f15f997fb2 
 GET {{endpoint}}/{{UserID}} HTTP/3.0
 content-type: application/json
 x-api-key: blahblah
@@ -122,7 +122,7 @@ x-api-key: blahblah
 
 }
 ###
-@UserdeleteID = 68f245a741ad8ff361cd572c
+@UserdeleteID = 68f406f5cec110f15f997fb2
 DELETE {{endpoint}}/{{UserID}} HTTP/3.0
 content-type: application/json
 x-api-key: blahblah
