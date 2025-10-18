@@ -67,8 +67,9 @@ content-type: application/json
 x-api-key: blahblah
 
 ###
-@Name = CarmalSquares 2124324
-GET {{endpoint}}/name/{{Name}} HTTP/3.0
+@NameBad = CarmalSquares 2124324
+@NameGood = AppleTart
+GET {{endpoint}}/name/{{NameBad}} HTTP/3.0
 content-type: application/json
 x-api-key: blahblah
 
