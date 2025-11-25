@@ -1,24 +1,26 @@
 import express, {Router} from 'express';
 import { validate } from '../middleware/validate.middleware';
 import { createRecipeSchema } from '../models/recipe'; 
-import {
-  getAllRecipes,
-  getRecipeById,
-  getRecipeByName ,
-  createRecipe,
-  updateRecipe,
-  deleteRecipe,
-} from '../controllers/recipe';
+import {getAllRecipes,getRecipeById,getRecipeByName,getRecipesByDifficulty,getRecipesByIngredient,
+  createRecipe,updateRecipe,deleteRecipe} from '../controllers/recipe';
 import {authenticateKey} from '../middleware/auth.middleware'
 
 const router: Router = express.Router();
 
-router.get('/', getAllRecipes);
-router.get('/:id', getRecipeById);
+// GET routes -- filters
+router.get('/difficulty/:difficulty', getRecipesByDifficulty);
+router.get('/ingredient/:ingredient', getRecipesByIngredient);
 router.get('/name/:name', getRecipeByName);
-router.post('/', authenticateKey, createRecipe);
-router.put('/:id', updateRecipe);
-router.delete('/:id', deleteRecipe);
-router.post('/', validate(createRecipeSchema), createRecipe);
+router.get('/:id', getRecipeById);
+router.get('/', getAllRecipes);
+
+// POST routes
+router.post('/', authenticateKey, validate(createRecipeSchema), createRecipe);
+
+// PUT routes
+router.put('/:id', authenticateKey, updateRecipe);
+
+// DELETE routes
+router.delete('/:id', authenticateKey, deleteRecipe);
 
 export default router;

@@ -7,13 +7,15 @@ import { createRecipeSchema } from '../models/recipe';
 
 // GET recipe by ID
 export const getRecipeById = async (req: Request, res: Response) => {
-    let id: string = req.params.id;
+  let id: string = req.params.id;
   try {
     const query = { _id: new ObjectId(id) };
-    const user = (await collections.book?.findOne(query)) as unknown as Recipe;
+    const recipe = (await collections.book?.findOne(query)) as unknown as Recipe;
 
-    if (user) {
-      res.status(200).send(user);
+    if (recipe) {
+      res.status(200).send(recipe);
+    } else {
+      res.status(404).send(`Unable to find matching document with id: ${req.params.id}`);
     }
   } catch (error) {
     res.status(404).send(`Unable to find matching document with id: ${req.params.id}`);
@@ -21,24 +23,58 @@ export const getRecipeById = async (req: Request, res: Response) => {
 };
 
 
-export const getAllRecipes = async (_req: Request, res: Response) => {
+// GET all recipes with optional filtering
+export const getAllRecipes = async (req: Request, res: Response) => {
   try {
-    const recipes = await collections.book?.find({}).toArray() as Recipe[] | undefined;
+    const { difficulty, minDifficulty, maxDifficulty, origin, ingredient } = req.query;
+    
+    let filter: any = {};
+
+    // Filter by exact difficulty
+    if (difficulty) {
+      const difficultyNum = parseInt(difficulty as string);
+      if (!isNaN(difficultyNum) && difficultyNum >= 1 && difficultyNum <= 5) {
+        filter.difficulty = difficultyNum;
+      }
+    }
+
+    // Filter by difficulty range
+    if (minDifficulty || maxDifficulty) {
+      filter.difficulty = {};
+      if (minDifficulty) {
+        const minDiff = parseInt(minDifficulty as string);
+        if (!isNaN(minDiff)) {
+          filter.difficulty.$gte = minDiff;
+        }
+      }
+      if (maxDifficulty) {
+        const maxDiff = parseInt(maxDifficulty as string);
+        if (!isNaN(maxDiff)) {
+          filter.difficulty.$lte = maxDiff;
+        }
+      }
+    }
+
+    // Filter by ingredient (case-insensitive partial match)
+    if (ingredient && typeof ingredient === 'string' && ingredient.trim() !== '') {
+      filter.ingredients = { $regex: ingredient.trim(), $options: 'i' };
+    }
+
+    const recipes = await collections.book?.find(filter).toArray() as Recipe[] | undefined;
 
     if (!recipes || recipes.length === 0) {
-      res.status(404).json({ message: "No recipes found." });
+      res.status(404).json({ message: "No recipes found matching the criteria." });
       return;
     }
 
     res.status(200).json(recipes);
   } catch (error) {
-    console.error("Error fetching all recipes:", error);
+    console.error("Error fetching recipes:", error);
     res.status(500).json({ message: "Failed to retrieve recipes." });
   }
 };
 
 
-//alter this to be able to search not by the exact match -- anything containing the string
 export const getRecipeByName = async (req: Request, res: Response) => {
   const name = req.params.name;
 
@@ -48,10 +84,13 @@ export const getRecipeByName = async (req: Request, res: Response) => {
   }
 
   try {
-    const recipes = await collections.book?.find({ name: name }).toArray() as Recipe[] | undefined;
+    // Use regex for case-insensitive partial matching
+    const recipes = await collections.book?.find({ 
+      name: { $regex: name.trim(), $options: 'i' } 
+    }).toArray() as Recipe[] | undefined;
 
     if (!recipes || recipes.length === 0) {
-      res.status(404).json({ message: `No recipe found with name: ${name}` });
+      res.status(404).json({ message: `No recipes found containing: ${name}` });
       return;
     }
 
@@ -59,6 +98,59 @@ export const getRecipeByName = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error fetching recipe by name:", error);
     res.status(500).json({ message: "Failed to retrieve recipe." });
+  }
+};
+
+// GET recipes by difficulty
+export const getRecipesByDifficulty = async (req: Request, res: Response) => {
+  const difficulty = req.params.difficulty;
+
+  const difficultyNum = parseInt(difficulty);
+
+  if (isNaN(difficultyNum) || difficultyNum < 1 || difficultyNum > 5) {
+    res.status(400).json({ message: "Difficulty must be a number between 1 and 5." });
+    return;
+  }
+
+  try {
+    const recipes = await collections.book?.find({ difficulty: difficultyNum }).toArray() as Recipe[] | undefined;
+
+    if (!recipes || recipes.length === 0) {
+      res.status(404).json({ message: `No recipes found with difficulty level: ${difficultyNum}` });
+      return;
+    }
+
+    res.status(200).json(recipes);
+  } catch (error) {
+    console.error("Error fetching recipes by difficulty:", error);
+    res.status(500).json({ message: "Failed to retrieve recipes." });
+  }
+};
+
+// GET recipes by ingredient
+export const getRecipesByIngredient = async (req: Request, res: Response) => {
+  const ingredient = req.params.ingredient;
+
+  if (!ingredient || ingredient.trim() === "") {
+    res.status(400).json({ message: "Ingredient is required." });
+    return;
+  }
+
+  try {
+    // Case-insensitive partial match in the ingredients array
+    const recipes = await collections.book?.find({
+      ingredients: { $regex: ingredient.trim(), $options: 'i' }
+    }).toArray() as Recipe[] | undefined;
+
+    if (!recipes || recipes.length === 0) {
+      res.status(404).json({ message: `No recipes found containing ingredient: ${ingredient}` });
+      return;
+    }
+
+    res.status(200).json(recipes);
+  } catch (error) {
+    console.error("Error fetching recipes by ingredient:", error);
+    res.status(500).json({ message: "Failed to retrieve recipes." });
   }
 };
 
@@ -87,7 +179,6 @@ export const createRecipe = async (req: Request, res: Response) => {
   try {
     const result = await collections.book?.insertOne(newRecipe);
 
-
     if (result) {
       res.status(201).location(`${result.insertedId}`).json({ message: `Created a new recipe with id ${result.insertedId}` });
     } else {
@@ -103,13 +194,11 @@ export const createRecipe = async (req: Request, res: Response) => {
 export const updateRecipe = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
 
-  // Validate ID format
   if (!ObjectId.isValid(id)) {
     res.status(400).json({ message: "Invalid recipe ID." });
     return;
   }
 
-  // Ensure there's at least one field to update
   if (!req.body || Object.keys(req.body).length === 0) {
     res.status(400).json({ message: "No fields provided for update." });
     return;
@@ -132,6 +221,7 @@ export const updateRecipe = async (req: Request, res: Response): Promise<void> =
     res.status(500).json({ message: "Failed to update recipe." });
   }
 };
+
 
 // DELETE recipe by ID
 export const deleteRecipe = async (req: Request, res: Response): Promise<void> => {
