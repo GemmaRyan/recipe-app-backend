@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { z } from "zod";
 
 export interface Recipe {
-    id?: ObjectId;
+    _id?: ObjectId;
     name: string;
     origin?:string;
     ingredients: string[];

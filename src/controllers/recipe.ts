@@ -190,7 +190,8 @@ export const createRecipe = async (req: Request, res: Response) => {
   }
 };
 
-// UPDATE recipe by ID
+
+//Updating the recipe
 export const updateRecipe = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
 
@@ -205,9 +206,16 @@ export const updateRecipe = async (req: Request, res: Response): Promise<void> =
   }
 
   try {
+    const { _id, ...updateData } = req.body;
+
+    if (Object.keys(updateData).length === 0) {
+      res.status(400).json({ message: "No valid fields provided for update." });
+      return;
+    }
+
     const result = await collections.book?.updateOne(
       { _id: new ObjectId(id) },
-      { $set: req.body }
+      { $set: updateData }
     );
 
     if (!result || result.matchedCount === 0) {
