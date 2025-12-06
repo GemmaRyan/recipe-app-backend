@@ -55,7 +55,7 @@ export const getAllRecipes = async (req: Request, res: Response) => {
       }
     }
 
-    // Filter by ingredient (case-insensitive partial match)
+    // Filter by ingredient 
     if (ingredient && typeof ingredient === 'string' && ingredient.trim() !== '') {
       filter.ingredients = { $regex: ingredient.trim(), $options: 'i' };
     }
@@ -84,7 +84,6 @@ export const getRecipeByName = async (req: Request, res: Response) => {
   }
 
   try {
-    // Use regex for case-insensitive partial matching
     const recipes = await collections.book?.find({ 
       name: { $regex: name.trim(), $options: 'i' } 
     }).toArray() as Recipe[] | undefined;
@@ -137,7 +136,6 @@ export const getRecipesByIngredient = async (req: Request, res: Response) => {
   }
 
   try {
-    // Case-insensitive partial match in the ingredients array
     const recipes = await collections.book?.find({
       ingredients: { $regex: ingredient.trim(), $options: 'i' }
     }).toArray() as Recipe[] | undefined;
