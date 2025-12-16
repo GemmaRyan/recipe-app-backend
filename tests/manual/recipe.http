@@ -127,3 +127,25 @@ x-api-key: blahblah
 DELETE {{endpoint}}/{{UserID}} HTTP/3.0
 content-type: application/json
 x-api-key: blahblah
+
+###
+POST http://localhost:3001/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Gemma",
+  "email": "gemma@test.com",
+  "password": "password123"
+}
+
+###
+
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "gemma@test.com",
+  "password": "password123"
+}
+
+
