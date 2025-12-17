@@ -15,7 +15,7 @@ export const registerUser = async (req: Request, res: Response) => {
     return res.status(400).json(validation.error);
   }
 
-  const { name, email, password } = validation.data;
+  const { name, email, phonenumber, password } = validation.data;
 
   const existing = await collections.users?.findOne({ email });
   if (existing) {
@@ -27,6 +27,7 @@ export const registerUser = async (req: Request, res: Response) => {
   await collections.users?.insertOne({
     name,
     email,
+    phonenumber,
     hashedPassword
   });
 
