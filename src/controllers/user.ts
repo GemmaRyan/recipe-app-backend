@@ -10,7 +10,8 @@ export const registerUser = async (req: Request, res: Response) => {
     return res.status(400).json(validation.error);
   }
 
-  const { name, email, phonenumber, password } = validation.data;
+  const { name, email, phone, dateOfBirth, password } = validation.data;
+
 
   const existing = await collections.users?.findOne({ email });
   if (existing) {
@@ -20,11 +21,13 @@ export const registerUser = async (req: Request, res: Response) => {
   const hashedPassword = await argon2.hash(password);
 
   await collections.users?.insertOne({
-    name,
-    email,
-    phonenumber,
-    hashedPassword
-  });
+  name,
+  email,
+  phone,
+  dateOfBirth,
+  hashedPassword
+});
+
 
   res.status(201).json({ message: "User registered" });
 };
