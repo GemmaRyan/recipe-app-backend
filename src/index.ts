@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import recipeRoutes from "./routes/recipe";
 import cors from 'cors';
 import { initDb } from "./database";
+import authRoutes from "./routes/auth";
+
 
 dotenv.config(); 
 
@@ -29,6 +31,7 @@ app.get("/ping", (_req: Request, res: Response) => {
 
 app.use("/api/recipes", recipeRoutes);
 
+app.use("/api/auth", authRoutes);
 
 initDb().then(() => {
   app.listen(PORT, () => {
