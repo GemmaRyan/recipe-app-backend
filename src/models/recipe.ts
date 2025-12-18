@@ -2,15 +2,18 @@ import { ObjectId } from "mongodb";
 import { z } from "zod";
 
 export interface Recipe {
-    _id?: ObjectId;
-    name: string;
-    origin?:string;
-    ingredients: string[];
-    difficulty: number;
-    recipe: string[];
-    cookingDuration?: string;
-    imageUrl?: string;
+  _id?: ObjectId;
+  name: string;
+  origin?: string;
+  ingredients: string[];
+  difficulty: number;
+  recipe: string[];
+  cookingDuration?: string;
+  imageUrl?: string;
+  createdBy: ObjectId;
+  createdByUsername: string; 
 }
+
 
 export const createRecipeSchema = z.object({
    name: z
@@ -20,7 +23,6 @@ export const createRecipeSchema = z.object({
 
   origin: z
     .string()
-    .url("Origin must be a valid URL") 
     .optional(),
 
   ingredients: z

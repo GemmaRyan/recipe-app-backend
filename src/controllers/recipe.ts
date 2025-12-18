@@ -15,8 +15,7 @@ export const registerUser = async (req: Request, res: Response) => {
     return res.status(400).json(validation.error);
   }
 
-  const { name, email, phone, dateOfBirth, password } = validation.data;
-
+ const { name,username,email,phone,dateOfBirth,password} = validation.data;
 
   const existing = await collections.users?.findOne({ email });
   if (existing) {
@@ -27,11 +26,14 @@ export const registerUser = async (req: Request, res: Response) => {
 
   await collections.users?.insertOne({
   name,
+  username,
   email,
   phone,
   dateOfBirth,
+  role: 'user',
   hashedPassword
 });
+
 
 
   res.status(201).json({ message: "User registered" });
@@ -198,6 +200,8 @@ export const createRecipe = async (req: Request, res: Response) => {
       errors: validation.error.issues,
     });
   }
+  const { userId, username } = res.locals.payload;
+
 
   const { name, ingredients, origin, difficulty, recipe, imageUrl, cookingDuration } = validation.data;
 
@@ -206,7 +210,11 @@ export const createRecipe = async (req: Request, res: Response) => {
     return;
   }
 
-  const newRecipe: Recipe = { name, ingredients, origin, difficulty, recipe, imageUrl, cookingDuration };
+  const newRecipe: Recipe = {
+    name, ingredients, origin, difficulty, recipe, imageUrl, cookingDuration,
+    createdBy: new ObjectId(String(userId)),   //adding the users id who created the recipe-- may be wrong check back later
+    createdByUsername: username
+  };
 
   try {
     const result = await collections.book?.insertOne(newRecipe);

@@ -1,6 +1,7 @@
 import express, {Router} from 'express';
 import {getAllRecipes,getRecipeById,getRecipeByName,getRecipesByDifficulty,getRecipesByIngredient,
   createRecipe,updateRecipe,deleteRecipe} from '../controllers/recipe';
+  import { validJWTProvided , isOwnerOrAdmin } from '../middleware/validate.middleware';
 
 
 const router: Router = express.Router();
@@ -11,14 +12,10 @@ router.get('/name/:name', getRecipeByName);
 router.get('/:id', getRecipeById);
 router.get('/', getAllRecipes);
 
-// POST routes
-router.post('/', createRecipe); //removing the authenticateKey for testing purposes
+router.post('/', validJWTProvided, createRecipe);
+router.put('/:id', validJWTProvided, isOwnerOrAdmin, updateRecipe);
+router.delete('/:id', validJWTProvided, isOwnerOrAdmin, deleteRecipe);
 
-// PUT routes
-router.put('/:id', updateRecipe);
-
-// DELETE routes
-router.delete('/:id', deleteRecipe);
 
 
 export default router;

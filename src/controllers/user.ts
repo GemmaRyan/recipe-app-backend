@@ -10,21 +10,28 @@ export const registerUser = async (req: Request, res: Response) => {
     return res.status(400).json(validation.error);
   }
 
-  const { name, email, phone, dateOfBirth, password } = validation.data;
+const { name,username,email,phone,dateOfBirth,password} = validation.data;
 
+  const existingUser = await collections.users?.findOne({
+  $or: [{ email }, { username }]
+});
 
-  const existing = await collections.users?.findOne({ email });
-  if (existing) {
-    return res.status(400).json({ message: "Email already exists" });
-  }
+if (existingUser) {
+  return res.status(409).json({
+    message: 'Email or username already exists'
+  });
+}
+
 
   const hashedPassword = await argon2.hash(password);
 
   await collections.users?.insertOne({
   name,
+  username,
   email,
   phone,
   dateOfBirth,
+  role: 'user',
   hashedPassword
 });
 
