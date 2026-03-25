@@ -12,6 +12,8 @@ export interface Recipe {
   imageUrl?: string;
   createdBy: ObjectId;
   createdByUsername: string; 
+  viewCount: number;
+  lastViewedAt?: Date;
 }
 
 

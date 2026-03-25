@@ -213,7 +213,9 @@ export const createRecipe = async (req: Request, res: Response) => {
   const newRecipe: Recipe = {
     name, ingredients, origin, difficulty, recipe, imageUrl, cookingDuration,
     createdBy: new ObjectId(String(userId)),   //adding the users id who created the recipe-- may be wrong check back later
-    createdByUsername: username
+    createdByUsername: username,
+    viewCount: 0,
+    lastViewedAt: new Date()
   };
 
   try {
@@ -292,5 +294,24 @@ export const deleteRecipe = async (req: Request, res: Response): Promise<void> =
   } catch (error) {
     console.error("Error deleting recipe:", error);
     res.status(500).json({ message: "Failed to delete recipe." });
+  }
+};
+
+export const getTopViewedRecipe = async (req: Request, res: Response) => {
+  try {
+    const topRecipe = await collections.book
+      ?.find({})
+      .sort({ viewCount: -1, lastViewedAt: -1 })
+      .limit(1)
+      .next();
+
+    if (!topRecipe) {
+      return res.status(404).json({ message: "No recipes found" });
+    }
+
+    res.status(200).json(topRecipe);
+  } catch (error) {
+    console.error("Error fetching top viewed recipe:", error);
+    res.status(500).json({ message: "Failed to fetch top viewed recipe." });
   }
 };
