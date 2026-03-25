@@ -5,6 +5,7 @@ import { ObjectId } from 'mongodb';
 import { createRecipeSchema } from '../models/recipe';
 import { createUserSchema } from "../models/user";
 import * as argon2 from "argon2";
+import axios from "axios";
 
 
 //Register new user
@@ -39,6 +40,42 @@ export const registerUser = async (req: Request, res: Response) => {
   res.status(201).json({ message: "User registered" });
 };
 
+export const incrementRecipeView = async (req: Request, res: Response) => {
+  const id = req.params.id;
+
+  if (!ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid recipe ID." });
+  }
+
+  try {
+    const lambdaViewApi = process.env.LAMBDA_VIEW_API;
+
+    if (!lambdaViewApi) {
+      return res.status(500).json({
+        message: "LAMBDA_VIEW_API is missing from .env"
+      });
+    }
+
+    const lambdaUrl = `${lambdaViewApi}/${id}`;
+
+    console.log("Calling Lambda API:", lambdaUrl);
+
+    const response = await axios.post(lambdaUrl, {});
+
+    console.log("Lambda API response:", response.data);
+
+    return res.status(200).json({
+      message: "Recipe view counted"
+    });
+  } catch (error: any) {
+    console.error("Error calling Lambda API:", error?.response?.data || error.message);
+
+    return res.status(500).json({
+      message: "Failed to invoke Lambda API",
+      error: error?.response?.data || error.message
+    });
+  }
+};
 
 
 // GET recipe by ID
