@@ -72,3 +72,24 @@ export const isOwnerOrAdmin = async (
 
   return res.status(403).json({ message: 'Not authorised' });
 };
+
+export const optionalJWTProvided = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader?.startsWith('Bearer ')) {
+    return next();
+  }
+
+  try {
+    const token = authHeader.split(' ')[1];
+    const payload = jwt.verify(token, process.env.JWTSECRET!);
+    res.locals.payload = payload;
+    next();
+  } catch {
+    next();
+  }
+};

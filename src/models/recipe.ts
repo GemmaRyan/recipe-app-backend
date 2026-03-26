@@ -14,6 +14,7 @@ export interface Recipe {
   createdByUsername: string; 
   viewCount: number;
   lastViewedAt?: Date;
+  visibility: 'public' | 'private';
 }
 
 
@@ -50,5 +51,7 @@ export const createRecipeSchema = z.object({
     .optional(),
 
   imageUrl: z.string().optional(),
+
+  visibility: z.enum(['public', 'private']).default('public')
 });
 

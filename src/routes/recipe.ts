@@ -3,20 +3,18 @@ import {getAllRecipes,getRecipeById,getRecipeByName,getRecipesByDifficulty,getRe
   createRecipe,updateRecipe,deleteRecipe,
   getTopViewedRecipe,
   incrementRecipeView} from '../controllers/recipe';
-  import { validJWTProvided , isOwnerOrAdmin } from '../middleware/validate.middleware';
+import { validJWTProvided, isOwnerOrAdmin, optionalJWTProvided } from '../middleware/validate.middleware';
 
 
 const router: Router = express.Router();
 
-router.get('/top-viewed', getTopViewedRecipe);
-router.get('/difficulty/:difficulty', getRecipesByDifficulty);
-router.get('/ingredient/:ingredient', getRecipesByIngredient);
-router.get('/name/:name', getRecipeByName);
+router.get('/top-viewed', optionalJWTProvided, getTopViewedRecipe);
+router.get('/difficulty/:difficulty', optionalJWTProvided, getRecipesByDifficulty);
+router.get('/ingredient/:ingredient', optionalJWTProvided, getRecipesByIngredient);
+router.get('/name/:name', optionalJWTProvided, getRecipeByName);
 router.post('/:id/view', incrementRecipeView);
-router.get('/:id', getRecipeById);
-router.get('/', getAllRecipes);
-
-
+router.get('/:id', optionalJWTProvided, getRecipeById);
+router.get('/', optionalJWTProvided, getAllRecipes);
 
 router.post('/', validJWTProvided, createRecipe);
 router.put('/:id', validJWTProvided, isOwnerOrAdmin, updateRecipe);

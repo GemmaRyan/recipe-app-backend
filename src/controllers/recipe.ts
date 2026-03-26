@@ -80,18 +80,39 @@ export const incrementRecipeView = async (req: Request, res: Response) => {
 
 // GET recipe by ID
 export const getRecipeById = async (req: Request, res: Response) => {
-  let id: string = req.params.id;
-  try {
-    const query = { _id: new ObjectId(id) };
-    const recipe = (await collections.book?.findOne(query)) as unknown as Recipe;
+  const id = req.params.id;
 
-    if (recipe) {
-      res.status(200).send(recipe);
-    } else {
-      res.status(404).send(`Unable to find matching document with id: ${req.params.id}`);
+  try {
+    const recipe = await collections.book?.findOne({
+      _id: new ObjectId(id)
+    }) as Recipe | null;
+
+    if (!recipe) {
+      return res.status(404).send(`Unable to find matching document with id: ${req.params.id}`);
     }
+
+    // Public recipes can be viewed by anyone
+    if (recipe.visibility === 'public') {
+      return res.status(200).send(recipe);
+    }
+
+    // Private recipes need login
+    const payload = res.locals.payload;
+
+    if (!payload) {
+      return res.status(403).json({ message: "This recipe is private." });
+    }
+
+    const isOwner = recipe.createdBy.toString() === String(payload.userId);
+    const isAdmin = payload.role === 'admin';
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ message: "This recipe is private." });
+    }
+
+    return res.status(200).send(recipe);
   } catch (error) {
-    res.status(404).send(`Unable to find matching document with id: ${req.params.id}`);
+    return res.status(404).send(`Unable to find matching document with id: ${req.params.id}`);
   }
 };
 
@@ -100,10 +121,24 @@ export const getRecipeById = async (req: Request, res: Response) => {
 export const getAllRecipes = async (req: Request, res: Response) => {
   try {
     const { difficulty, minDifficulty, maxDifficulty, origin, ingredient } = req.query;
-    
+    const payload = res.locals.payload;
+
     let filter: any = {};
 
-    // Filter by exact difficulty
+    // Visibility rules
+    if (!payload) {
+      // not logged in -> public only
+      filter.visibility = 'public';
+    } else if (payload.role !== 'admin') {
+      // logged in normal user -> public + own recipes
+      filter.$or = [
+        { visibility: 'public' },
+        { createdBy: new ObjectId(String(payload.userId)) }
+      ];
+    }
+    // admin: no visibility restriction
+
+    // Exact difficulty
     if (difficulty) {
       const difficultyNum = parseInt(difficulty as string);
       if (!isNaN(difficultyNum) && difficultyNum >= 1 && difficultyNum <= 5) {
@@ -111,9 +146,11 @@ export const getAllRecipes = async (req: Request, res: Response) => {
       }
     }
 
-    // Filter by difficulty range
+    // Difficulty range
     if (minDifficulty || maxDifficulty) {
-      filter.difficulty = {};
+      if (!filter.difficulty) {
+        filter.difficulty = {};
+      }
       if (minDifficulty) {
         const minDiff = parseInt(minDifficulty as string);
         if (!isNaN(minDiff)) {
@@ -128,7 +165,7 @@ export const getAllRecipes = async (req: Request, res: Response) => {
       }
     }
 
-    // Filter by ingredient 
+    // Ingredient filter
     if (ingredient && typeof ingredient === 'string' && ingredient.trim() !== '') {
       filter.ingredients = { $regex: ingredient.trim(), $options: 'i' };
     }
@@ -136,8 +173,7 @@ export const getAllRecipes = async (req: Request, res: Response) => {
     const recipes = await collections.book?.find(filter).toArray() as Recipe[] | undefined;
 
     if (!recipes || recipes.length === 0) {
-      res.status(404).json({ message: "No recipes found matching the criteria." });
-      return;
+      return res.status(404).json({ message: "No recipes found matching the criteria." });
     }
 
     res.status(200).json(recipes);
@@ -240,7 +276,7 @@ export const createRecipe = async (req: Request, res: Response) => {
   const { userId, username } = res.locals.payload;
 
 
-  const { name, ingredients, origin, difficulty, recipe, imageUrl, cookingDuration } = validation.data;
+  const { name, ingredients, origin, difficulty, recipe, imageUrl, cookingDuration, visibility } = validation.data;
 
   if (!name || !ingredients || !difficulty || !recipe) {
     res.status(400).json({ message: "Missing required fields." });
@@ -252,7 +288,8 @@ export const createRecipe = async (req: Request, res: Response) => {
     createdBy: new ObjectId(String(userId)),   //adding the users id who created the recipe-- may be wrong check back later
     createdByUsername: username,
     viewCount: 0,
-    lastViewedAt: new Date()
+    lastViewedAt: new Date(),
+    visibility
   };
 
   try {
@@ -351,4 +388,21 @@ export const getTopViewedRecipe = async (req: Request, res: Response) => {
     console.error("Error fetching top viewed recipe:", error);
     res.status(500).json({ message: "Failed to fetch top viewed recipe." });
   }
+};
+
+
+export const addFavourite = async (req: Request, res: Response) => {
+  const { userId } = res.locals.payload;
+  const recipeId = req.params.recipeId;
+
+  if (!ObjectId.isValid(recipeId)) {
+    return res.status(400).json({ message: 'Invalid recipe ID' });
+  }
+
+  await collections.users?.updateOne(
+    { _id: new ObjectId(String(userId)) },
+    { $addToSet: { favourites: new ObjectId(recipeId) } }
+  );
+
+  res.status(200).json({ message: 'Recipe added to favourites' });
 };
