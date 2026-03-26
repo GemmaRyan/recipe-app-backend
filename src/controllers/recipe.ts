@@ -389,20 +389,3 @@ export const getTopViewedRecipe = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to fetch top viewed recipe." });
   }
 };
-
-
-export const addFavourite = async (req: Request, res: Response) => {
-  const { userId } = res.locals.payload;
-  const recipeId = req.params.recipeId;
-
-  if (!ObjectId.isValid(recipeId)) {
-    return res.status(400).json({ message: 'Invalid recipe ID' });
-  }
-
-  await collections.users?.updateOne(
-    { _id: new ObjectId(String(userId)) },
-    { $addToSet: { favourites: new ObjectId(recipeId) } }
-  );
-
-  res.status(200).json({ message: 'Recipe added to favourites' });
-};

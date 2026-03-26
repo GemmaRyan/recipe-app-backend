@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { z } from "zod";
 
+
 export interface User {
   _id?: ObjectId;
   name: string;
@@ -10,6 +11,7 @@ export interface User {
   dateOfBirth: string;
   role: 'user' | 'admin';
   hashedPassword: string;
+  favourites?: ObjectId[];
 }
 
 export const createUserSchema = z.object({
