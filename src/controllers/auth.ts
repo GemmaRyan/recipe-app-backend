@@ -10,12 +10,41 @@ export const loginUser = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "Email and password required" });
   }
 
+  // Hardcoded admin login
   if (email === 'gem@email.com' && password === 'password') {
+    let adminUser = await collections.users?.findOne({ email: 'gem@email.com' });
+
+    // create the admin user in MongoDB if it does not already exist
+    if (!adminUser) {
+      const hashedPassword = await argon2.hash('password');
+
+      const insertResult = await collections.users?.insertOne({
+        name: 'Admin',
+        username: 'admin',
+        email: 'gem@email.com',
+        phone: '0000000000',
+        dateOfBirth: '2000-01-01',
+        role: 'admin',
+        hashedPassword,
+        favourites: []
+      });
+
+      if (!insertResult) {
+        return res.status(500).json({ message: 'Failed to create admin user' });
+      }
+
+      adminUser = await collections.users?.findOne({ _id: insertResult.insertedId });
+    }
+
+    if (!adminUser) {
+      return res.status(500).json({ message: 'Admin user could not be loaded' });
+    }
+
     const token = jwt.sign(
       {
-        userId: 'admin',
-        username: 'admin',
-        email,
+        userId: adminUser._id.toString(),
+        username: adminUser.username,
+        email: adminUser.email,
         role: 'admin'
       },
       process.env.JWTSECRET!,
@@ -37,21 +66,16 @@ export const loginUser = async (req: Request, res: Response) => {
     return res.status(401).json({ message: "Invalid email or password" });
   }
 
-
-  //token sign in with auto logout 
- const token = jwt.sign(
-  {
-    userId: user._id.toString(),
-    username: user.username,
-    email: user.email,
-    role:
-      user.email === 'gem@email.com' ? 'admin' : 'user'
-  },
-  process.env.JWTSECRET!,
-  { expiresIn: '2h' }
-);
-
-
+  const token = jwt.sign(
+    {
+      userId: user._id.toString(),
+      username: user.username,
+      email: user.email,
+      role: user.role === 'admin' ? 'admin' : 'user'
+    },
+    process.env.JWTSECRET!,
+    { expiresIn: '2h' }
+  );
 
   res.json({ accessToken: token });
 };
